@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập Chia Động Từ Online</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 20px; border-bottom: 3px solid #e67e22; padding-bottom: 10px; }
+        .instruction { background: #fff3e0; padding: 15px; border-left: 5px solid #e67e22; margin-bottom: 25px; font-weight: 500; }
+        .question-item { margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; }
+        .question-text { font-size: 1.05em; margin-bottom: 10px; }
+        input[type="text"] { border: 2px solid #ddd; border-radius: 4px; padding: 8px 12px; width: 250px; font-size: 1em; outline: none; transition: border-color 0.3s; }
+        input[type="text"]:focus { border-color: #e67e22; }
+        
+        .btn-container { text-align: center; margin-top: 30px; }
+        button { background-color: #e67e22; color: white; border: none; padding: 12px 35px; font-size: 18px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-weight: bold; }
+        button:hover { background-color: #d35400; }
+
+        #result-box { display: none; margin-top: 30px; padding: 20px; border-radius: 10px; background: #fff; border: 2px solid #e67e22; animation: slideIn 0.5s; }
+        .summary-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        .summary-table th { background-color: #e67e22; color: white; }
+
+        .explanation { display: none; margin-top: 10px; font-size: 0.95em; color: #555; background: #fdf2e9; padding: 10px; border-radius: 5px; }
+        .correct-mark { color: #27ae60; font-weight: bold; margin-left: 10px; }
+        .wrong-mark { color: #e74c3c; font-weight: bold; margin-left: 10px; }
+        .status-icon { font-size: 1.2em; margin-right: 5px; }
+
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>GIVE THE CORRECT FORM OF THE VERBS</h1>
+    <p class="instruction">Give the correct tense or form of the verbs in the blanks.</p>
+
+    <form id="verbQuiz">
+        <div id="quiz-content"></div>
+
+        <div class="btn-container">
+            <button type="button" onclick="checkVerbs()">Kiểm Tra Đáp ÁN</button>
+        </div>
+    </form>
+
+    <div id="result-box">
+        <h2 style="text-align: center; color: #e67e22;">KẾT QUẢ BÀI LÀM</h2>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Tổng số câu</th>
+                    <th>Câu đúng</th>
+                    <th>Câu sai</th>
+                    <th>Tỷ lệ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="total">15</td>
+                    <td id="correct">0</td>
+                    <td id="wrong">0</td>
+                    <td id="percent">0%</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="text-align: center; font-style: italic;">Chi tiết giải thích đã được hiển thị dưới từng câu hỏi.</p>
+    </div>
+</div>
+
+<script>
+    const verbData = [
+        { q: "I couldn’t resist (laugh) at the way he answered my question.", ans: ["laughing"], exp: "Resist + V-ing: Không nhịn được/chống lại việc gì." },
+        { q: "He refused (join) us on the trip to the mountains.", ans: ["to join"], exp: "Refuse + to-V: Từ chối làm gì." },
+        { q: "It is raining. We can’t do anything until it (stop).", ans: ["stops"], exp: "Trong mệnh đề trạng ngữ chỉ thời gian (Until), dùng hiện tại đơn để nói về tương lai." },
+        { q: "He’s used to (ask) what to do at home.", ans: ["being asked"], exp: "Be used to + V-ing. Ở đây mang nghĩa bị động: Quen với việc được hỏi." },
+        { q: "Everyone (hope) that I will pass the entrance exam.", ans: ["hopes"], exp: "Everyone là đại từ bất định số ít, chia động từ thêm 's'." },
+        { q: "You’d better have your hair (cut).", ans: ["cut"], exp: "Have something done (P2): Cấu trúc bị động nhờ vả. Cột 3 của 'cut' vẫn là 'cut'." },
+        { q: "Much progress (make) in study in this class this term.", ans: ["has been made"], exp: "Thì hiện tại hoàn thành dạng bị động (Much progress là danh từ không đếm được)." },
+        { q: "I think your garden needs (weed), and you had better (have) it done tomorrow.", ans: ["weeding", "to be weeded", "have"], exp: "Need + V-ing/to be P2 (nghĩa bị động). Had better + V-bare (nên làm gì)." },
+        { q: "Nigel felt sick from (eat) too many cakes.", ans: ["eating"], exp: "Sau giới từ (from) dùng V-ing." },
+        { q: "Though (write) for children, “Alice in the Wonderland” appeals to many adults.", ans: ["written", "being written"], exp: "Rút gọn mệnh đề trạng ngữ dạng bị động (Cuốn sách được viết)." },
+        { q: "Seldom one (hear) a politician say 'sorry'.", ans: ["does one hear"], exp: "Đảo ngữ với các trạng từ phủ định (Seldom) đứng đầu câu." },
+        { q: "When we were children, our parents (forever/ tell) us to tidy up.", ans: ["were forever telling"], exp: "Thì quá khứ tiếp diễn kết hợp với 'always/forever' để phàn nàn về hành động lặp lại trong quá khứ." },
+        { q: "Nadal: Didn’t you know she works as a curator? - Mai: She (tell) me, but I probably forgot.", ans: ["had told", "told", "did tell"], exp: "Sự việc đã xảy ra trước một thời điểm trong quá khứ hoặc nhấn mạnh việc đã nói." },
+        { q: "If you (stay) out late, no wonder you will be tired.", ans: ["stay"], exp: "Câu điều kiện loại 1, mệnh đề If chia hiện tại đơn." },
+        { q: "A lot of people (kill) by AIDS recently, and I wish nobody (die) any more.", ans: ["have been killed", "died", "would die"], exp: "Vế 1 dùng Hiện tại hoàn thành bị động (Recently). Vế 2 dùng 'wish' cho tương lai/hiện tại (died/would die)." }
+    ];
+
+    const content = document.getElementById('quiz-content');
+
+    verbData.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        div.id = `q-block-${i}`;
+        
+        // Xử lý câu 8 có 2 chỗ điền
+        const inputHTML = i === 7 
+            ? `<div style="margin-top:5px;">
+                1: <input type="text" id="ans-${i}-a" placeholder="Vị trí 1..."> 
+                2: <input type="text" id="ans-${i}-b" placeholder="Vị trí 2...">
+               </div>`
+            : `<input type="text" id="ans-${i}" placeholder="Type your answer here...">`;
+
+        div.innerHTML = `
+            <div class="question-text"><strong>Câu ${i+1}:</strong> ${item.q}</div>
+            ${inputHTML}
+            <div class="explanation" id="exp-${i}">
+                <span id="status-${i}"></span>
+                <strong>Đáp án đúng:</strong> ${item.ans.join(' / ')} <br>
+                <strong>Giải thích:</strong> ${item.exp}
+            </div>
+        `;
+        content.appendChild(div);
+    });
+
+    function checkVerbs() {
+        let correctCount = 0;
+        
+        verbData.forEach((item, i) => {
+            const expDiv = document.getElementById(`exp-${i}`);
+            const statusSpan = document.getElementById(`status-${i}`);
+            let isCorrect = false;
+
+            if (i === 7) { // Xử lý đặc biệt câu 8
+                const valA = document.getElementById(`ans-${i}-a`).value.trim().toLowerCase();
+                const valB = document.getElementById(`ans-${i}-b`).value.trim().toLowerCase();
+                // Chấp nhận weeding hoặc to be weeded cho vị trí 1
+                const part1Correct = (valA === "weeding" || valA === "to be weeded");
+                const part2Correct = (valB === "have");
+                isCorrect = part1Correct && part2Correct;
+            } else {
+                const val = document.getElementById(`ans-${i}`).value.trim().toLowerCase();
+                isCorrect = item.ans.some(a => a.toLowerCase() === val);
+            }
+
+            expDiv.style.display = 'block';
+            if (isCorrect) {
+                correctCount++;
+                statusSpan.innerHTML = '<span class="status-icon">✅</span> <span class="correct-mark">Đúng!</span>';
+            } else {
+                statusSpan.innerHTML = '<span class="status-icon">❌</span> <span class="wrong-mark">Sai rồi!</span>';
+            }
+        });
+
+        // Cập nhật bảng kết quả
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('correct').innerText = correctCount;
+        document.getElementById('wrong').innerText = verbData.length - correctCount;
+        document.getElementById('percent').innerText = Math.round((correctCount/verbData.length)*100) + '%';
+        
+        window.scrollTo({ top: document.getElementById('result-box').offsetTop - 20, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

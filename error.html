@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập Tìm Lỗi Sai Online</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff5f5; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #c62828; text-align: center; margin-bottom: 20px; border-bottom: 3px solid #ef5350; padding-bottom: 10px; }
+        .instruction { background: #ffebee; padding: 15px; border-left: 5px solid #c62828; margin-bottom: 25px; font-weight: 500; }
+        .question-item { margin-bottom: 25px; padding: 15px; border: 1px solid #ffcdd2; border-radius: 8px; background: #fffafb; }
+        .question-text { font-size: 1.1em; margin-bottom: 12px; color: #444; }
+        .input-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .input-box { display: flex; align-items: center; gap: 5px; }
+        input[type="text"] { border: 2px solid #ddd; border-radius: 4px; padding: 8px; width: 180px; outline: none; }
+        input[type="text"]:focus { border-color: #c62828; }
+        
+        .btn-container { text-align: center; margin-top: 30px; }
+        button { background-color: #c62828; color: white; border: none; padding: 12px 35px; font-size: 18px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-weight: bold; }
+        button:hover { background-color: #b71c1c; }
+
+        #result-box { display: none; margin-top: 30px; padding: 20px; border-radius: 10px; background: #fff; border: 2px solid #c62828; animation: slideIn 0.5s; }
+        .summary-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        .summary-table th { background-color: #c62828; color: white; }
+
+        .explanation { display: none; margin-top: 15px; font-size: 0.95em; background: #fff3f3; padding: 12px; border-radius: 5px; border-left: 4px solid #f44336; }
+        .correct-ans { color: #2e7d32; font-weight: bold; }
+        .wrong-ans { color: #c62828; text-decoration: line-through; }
+
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ERROR IDENTIFICATION & CORRECTION</h1>
+    <p class="instruction">Each of the following sentences has an error. Find the error and correct it.</p>
+
+    <form id="errorQuiz">
+        <div id="quiz-content"></div>
+
+        <div class="btn-container">
+            <button type="button" onclick="checkErrors()">Nộp Bài & Xem Đáp Án</button>
+        </div>
+    </form>
+
+    <div id="result-box">
+        <h2 style="text-align: center; color: #c62828;">KẾT QUẢ CHI TIẾT</h2>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Tổng số câu</th>
+                    <th>Lỗi tìm đúng</th>
+                    <th>Điểm số</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="total">19</td>
+                    <td id="correct">0</td>
+                    <td id="score">0/10</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const errorData = [
+        { q: "Hung really wishes that he can take part in the game.", err: "can", fix: "could", exp: "Câu ước cho hiện tại: S + wish + S + V-ed/could." },
+        { q: "They’re going to get their house decorate for the May Day.", err: "decorate", fix: "decorated", exp: "Cấu trúc bị động nhờ vả: Get something + P2 (decorated)." },
+        { q: "I used to sit next to a man who name is Almed.", err: "who", fix: "whose", exp: "Dùng đại từ quan hệ sở hữu 'whose' thay cho 'who' vì đứng trước danh từ 'name'." },
+        { q: "I’d rather typing this letter than write it because it’s faster.", err: "typing", fix: "type", exp: "Cấu trúc: Would rather + V-bare + than + V-bare." },
+        { q: "He drives too fast that no one likes to ride with him.", err: "too", fix: "so", exp: "Cấu trúc: So + Adj/Adv + that + mệnh đề (Quá... đến nỗi mà)." },
+        { q: "My teacher makes me to do all these exercises.", err: "to do", fix: "do", exp: "Cấu trúc: Make someone + V-bare (ép buộc ai làm gì)." },
+        { q: "I teach English here since I graduated from university.", err: "teach", fix: "have taught", exp: "Dấu hiệu 'since' dùng thì Hiện tại hoàn thành (have taught)." },
+        { q: "They are so naughty children that their mother can’t stand them.", err: "so", fix: "such", exp: "Cấu trúc: Such + (a/an) + Adj + N + that. 'So' chỉ đi trực tiếp với Adj." },
+        { q: "Jim said that he was playing the piano in the hall now.", err: "now", fix: "then", exp: "Câu gián tiếp: Trạng từ 'now' phải chuyển thành 'then'." },
+        { q: "My mother is cooking something in the kitchen now. It smells very well.", err: "well", fix: "good", exp: "Smell là một linking verb, đi kèm với tính từ (good) thay vì trạng từ (well)." },
+        { q: "I met Lan yesterday, so we stopped talking.", err: "talking", fix: "to talk", exp: "Stop to talk: Dừng lại để trò chuyện. (Stop talking là thôi không nói nữa)." },
+        { q: "I’m not used to drive in the left though I have lived here for 10 years ago.", err: "drive", fix: "driving", exp: "Be used to + V-ing (quen với việc gì)." },
+        { q: "He spoke a few English, so we were able to communicate with him.", err: "a few", fix: "a little", exp: "English là danh từ không đếm được, dùng 'a little' thay vì 'a few'." },
+        { q: "I look forward to have the resolution to the problem.", err: "have", fix: "having", exp: "Look forward to + V-ing: Mong đợi điều gì." },
+        { q: "They are going to get their house to redecorate for the Christmas.", err: "to redecorate", fix: "redecorated", exp: "Get something + P2 (bị động). 'Christmas' không đi kèm 'the'." },
+        { q: "The best way to eliminate a pest is to controlling the food accessible to it.", err: "controlling", fix: "control", exp: "Cấu trúc: To-inf (to control) đứng sau 'to' làm vị ngữ." },
+        { q: "Mumps are a very common disease which usually affects children.", err: "are", fix: "is", exp: "Mumps (bệnh quai bị) có 's' nhưng là danh từ số ít chỉ tên bệnh." },
+        { q: "The symptoms of diabetes are too slight that people don't notice them.", err: "too", fix: "so", exp: "Cấu trúc: So + Adj + that. 'Too' thường đi với 'to V'." },
+        { q: "I like the village which I spent my vacation last year.", err: "which", fix: "where", exp: "Dùng 'where' (hoặc in which) để chỉ nơi chốn." }
+    ];
+
+    const content = document.getElementById('quiz-content');
+
+    errorData.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        div.innerHTML = `
+            <div class="question-text"><strong>Câu ${i + 1}:</strong> ${item.q}</div>
+            <div class="input-group">
+                <div class="input-box">Lỗi: <input type="text" id="err-${i}" placeholder="Từ sai..."></div>
+                <div class="input-box">Sửa: <input type="text" id="fix-${i}" placeholder="Sửa thành..."></div>
+            </div>
+            <div class="explanation" id="exp-${i}">
+                <span id="status-${i}"></span><br>
+                <strong>Đáp án đúng:</strong> <span class="wrong-ans">${item.err}</span> → <span class="correct-ans">${item.fix}</span><br>
+                <strong>Giải thích:</strong> ${item.exp}
+            </div>
+        `;
+        content.appendChild(div);
+    });
+
+    function checkErrors() {
+        let correctCount = 0;
+        errorData.forEach((item, i) => {
+            const userErr = document.getElementById(`err-${i}`).value.trim().toLowerCase();
+            const userFix = document.getElementById(`fix-${i}`).value.trim().toLowerCase();
+            const expDiv = document.getElementById(`exp-${i}`);
+            const statusSpan = document.getElementById(`status-${i}`);
+            
+            expDiv.style.display = 'block';
+            
+            // Chấm điểm tương đối (đúng phần lỗi là có điểm)
+            if (userErr === item.err.toLowerCase()) {
+                correctCount++;
+                statusSpan.innerHTML = '<b style="color: #2e7d32;">✓ Chính xác</b>';
+            } else {
+                statusSpan.innerHTML = '<b style="color: #c62828;">✗ Chưa đúng</b>';
+            }
+        });
+
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('total').innerText = errorData.length;
+        document.getElementById('correct').innerText = correctCount;
+        document.getElementById('score').innerText = (correctCount / errorData.length * 10).toFixed(1) + "/10";
+        
+        window.scrollTo({ top: document.getElementById('result-box').offsetTop - 20, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập Phát Âm Tiếng Anh Online</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1a73e8; text-align: center; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; }
+        .instruction { font-style: italic; color: #555; margin-bottom: 25px; background: #e8f0fe; padding: 10px; border-left: 5px solid #1a73e8; }
+        .question-block { margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; transition: 0.3s; }
+        .question-text { font-weight: bold; margin-bottom: 10px; display: block; }
+        .options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        @media (max-width: 500px) { .options { grid-template-columns: 1fr; } }
+        label { cursor: pointer; padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; display: block; }
+        label:hover { background-color: #f8f9fa; }
+        input[type="radio"] { margin-right: 10px; }
+        
+        .btn-container { text-align: center; margin-top: 30px; }
+        button { background-color: #1a73e8; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #1557b0; }
+
+        #result-summary { display: none; margin-top: 20px; padding: 20px; background: #fff; border: 2px solid #1a73e8; border-radius: 10px; text-align: center; }
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 10px; }
+        .summary-table th { background-color: #1a73e8; color: white; }
+
+        .explanation { display: none; margin-top: 10px; padding: 10px; background-color: #fff3cd; border-left: 4px solid #ffc107; font-size: 0.95em; border-radius: 0 5px 5px 0; }
+        .correct { border-color: #28a745 !important; background-color: #e9f7ef; }
+        .incorrect { border-color: #dc3545 !important; background-color: #fdf2f2; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>BÀI TẬP PHÁT ÂM (PRONUNCIATION)</h1>
+    <p class="instruction">Choose one word whose underlined part is pronounced differently from the others.</p>
+
+    <form id="quizForm">
+        <div id="questions-container"></div>
+
+        <div class="btn-container">
+            <button type="button" onclick="submitQuiz()">Nộp Bài & Kiểm Tra</button>
+        </div>
+    </form>
+
+    <div id="result-summary">
+        <h2>Kết Quả Của Bạn</h2>
+        <table class="summary-table">
+            <tr>
+                <th>Tổng số câu</th>
+                <th>Số câu đúng</th>
+                <th>Số câu sai</th>
+                <th>Điểm số</th>
+            </tr>
+            <tr>
+                <td id="totalQ">23</td>
+                <td id="correctQ">0</td>
+                <td id="wrongQ">0</td>
+                <td id="score">0/10</td>
+            </tr>
+        </table>
+        <p><i>Vui lòng xem giải thích chi tiết ở từng câu dưới đây.</i></p>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "1", options: ["n<u>a</u>tural", "n<u>a</u>ture", "n<u>a</u>tive", "n<u>a</u>tion"], correct: 0, exp: "natural /'nætʃrəl/ (âm æ), còn lại là âm /eɪ/." },
+        { q: "2", options: ["sou<u>th</u>ern", "nor<u>th</u>ern", "mou<u>th</u>", "mon<u>th</u>"], correct: 0, exp: "southern /'sʌðən/ (âm ð), còn lại là âm /θ/." },
+        { q: "3", options: ["b<u>o</u>th", "cl<u>o</u>th", "gh<u>o</u>st", "s<u>o</u>ld"], correct: 1, exp: "cloth /klɒθ/ (âm ɒ), còn lại là âm /əʊ/." },
+        { q: "4", options: ["exam<u>i</u>ne", "determ<u>i</u>ne", "fam<u>i</u>ne", "d<u>i</u>ne"], correct: 3, exp: "dine /daɪn/ (âm aɪ), còn lại là âm /ɪ/." },
+        { q: "5", options: ["sacr<u>ed</u>", "decid<u>ed</u>", "contaminat<u>ed</u>", "water<u>ed</u>"], correct: 3, exp: "watered /'wɔːtəd/ (âm d), còn lại là âm /ɪd/." },
+        { q: "6", options: ["f<u>ai</u>thful", "f<u>ai</u>ry", "f<u>ai</u>lure", "f<u>ai</u>nted"], correct: 1, exp: "fairy /'feəri/ (âm eə), còn lại là âm /eɪ/." },
+        { q: "7", options: ["<u>e</u>mergency", "d<u>e</u>posit", "r<u>e</u>sident", "pr<u>e</u>fer"], correct: 0, exp: "emergency /i'mɜːdʒənsi/ (âm i), còn lại âm /ɪ/ hoặc /e/ tùy từ nhưng trọng âm và cách phát âm 'e' đầu của emergency khác biệt nhất." },
+        { q: "8", options: ["interest<u>ed</u>", "nak<u>ed</u>", "plant<u>ed</u>", "stopp<u>ed</u>"], correct: 3, exp: "stopped /stɒpt/ (âm t), còn lại là âm /ɪd/." },
+        { q: "9", options: ["t<u>or</u>nado", "c<u>on</u>cern", "c<u>on</u>venient", "c<u>on</u>clude"], correct: 0, exp: "tornado /tɔː'neɪdəʊ/ (âm ɔː), còn lại là âm tiết không trọng âm /ə/." },
+        { q: "10", options: ["n<u>a</u>ture", "ch<u>a</u>nge", "gr<u>a</u>vity", "b<u>a</u>sic"], correct: 2, exp: "gravity /'ɡrævəti/ (âm æ), còn lại là âm /eɪ/." },
+        { q: "11", options: ["expan<u>si</u>on", "explo<u>si</u>on", "vi<u>si</u>on", "deci<u>si</u>on"], correct: 0, exp: "expansion /ɪk'spænʃn/ (âm ʃ), còn lại là âm /ʒ/." },
+        { q: "12", options: ["con<u>s</u>erve", "pre<u>s</u>erve", "re<u>s</u>erve", "Japane<u>s</u>e"], correct: 0, exp: "conserve /kən'sɜːv/ (âm s), còn lại là âm /z/." },
+        { q: "13", options: ["pr<u>e</u>dict", "pr<u>e</u>paration", "<u>e</u>xpect", "<u>e</u>xtensive"], correct: 1, exp: "preparation /ˌprepə'reɪʃn/ (âm e), còn lại là âm /ɪ/." },
+        { q: "14", options: ["<u>g</u>orgeous", "cor<u>d</u>ial", "accor<u>d</u>", "crosswor<u>d</u>"], correct: 0, exp: "gorgeous /'ɡɔːdʒəs/ (âm dʒ), các từ còn lại âm gạch chân tập trung vào âm /d/." },
+        { q: "15", options: ["na<u>t</u>ural", "poten<u>t</u>ial", "ma<u>t</u>ure", "fluc<u>t</u>uate"], correct: 1, exp: "potential /pə'tenʃl/ (âm ʃ), còn lại âm /tʃ/." },
+        { q: "16", options: ["adverti<u>s</u>e", "exerci<u>s</u>e", "supervi<u>s</u>e", "overdo<u>s</u>e"], correct: 3, exp: "overdose /'əʊvədəʊs/ (âm s), còn lại là âm /z/." },
+        { q: "17", options: ["d<u>e</u>mon", "l<u>eo</u>pard", "v<u>e</u>ssel", "<u>e</u>ssay"], correct: 0, exp: "demon /'diːmən/ (âm iː), còn lại là âm /e/." },
+        { q: "18", options: ["co<u>n</u>gress", "la<u>n</u>guage", "challe<u>n</u>ge", "ma<u>n</u>go"], correct: 2, exp: "challenge /'tʃælɪndʒ/ (âm n), còn lại là âm /ŋ/." },
+        { q: "19", options: ["mat<u>ure</u>", "meas<u>ure</u>", "pleas<u>ure</u>", "treas<u>ure</u>"], correct: 0, exp: "mature /mə'tjʊə/ (âm tjʊə), còn lại là âm /ə/ (đi sau âm ʒ)." },
+        { q: "20", options: ["look<u>ed</u>", "nak<u>ed</u>", "book<u>ed</u>", "pack<u>ed</u>"], correct: 1, exp: "naked /'neɪkɪd/ (ngoại lệ /ɪd/), còn lại phát âm là /t/." },
+        { q: "21", options: ["<u>sw</u>eat", "<u>sw</u>ing", "<u>sw</u>ord", "<u>sw</u>am"], correct: 2, exp: "sword /sɔːd/ (âm w câm), còn lại có phát âm âm /w/." },
+        { q: "22", options: ["c<u>ur</u>ly", "n<u>ur</u>sing", "h<u>ur</u>tful", "b<u>ur</u>y"], correct: 3, exp: "bury /'beri/ (âm e), còn lại là âm /ɜː/." },
+        { q: "23", options: ["employ<u>ee</u>", "guarant<u>ee</u>", "refug<u>ee</u>", "committ<u>ee</u>"], correct: 3, exp: "committee /kə'mɪti/ (âm i ngắn), còn lại phát âm /iː/ kéo dài." }
+    ];
+
+    const container = document.getElementById('questions-container');
+
+    quizData.forEach((data, index) => {
+        const block = document.createElement('div');
+        block.className = 'question-block';
+        block.id = `block-${index}`;
+        
+        let optionsHTML = '';
+        const labels = ['A', 'B', 'C', 'D'];
+        data.options.forEach((opt, i) => {
+            optionsHTML += `
+                <label>
+                    <input type="radio" name="q${index}" value="${i}"> ${labels[i]}. ${opt}
+                </label>
+            `;
+        });
+
+        block.innerHTML = `
+            <span class="question-text">Câu ${index + 1}:</span>
+            <div class="options">${optionsHTML}</div>
+            <div class="explanation" id="exp-${index}">
+                <strong>Giải thích:</strong> ${data.exp}
+            </div>
+        `;
+        container.appendChild(block);
+    });
+
+    function submitQuiz() {
+        let correctCount = 0;
+        quizData.forEach((data, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            const block = document.getElementById(`block-${index}`);
+            const exp = document.getElementById(`exp-${index}`);
+            
+            exp.style.display = 'block'; 
+
+            if (selected) {
+                if (parseInt(selected.value) === data.correct) {
+                    correctCount++;
+                    block.className = 'question-block correct';
+                } else {
+                    block.className = 'question-block incorrect';
+                }
+            } else {
+                block.className = 'question-block incorrect';
+            }
+        });
+
+        document.getElementById('result-summary').style.display = 'block';
+        document.getElementById('totalQ').innerText = quizData.length;
+        document.getElementById('correctQ').innerText = correctCount;
+        document.getElementById('wrongQ').innerText = quizData.length - correctCount;
+        const scoreValue = (correctCount / quizData.length * 10).toFixed(2);
+        document.getElementById('score').innerText = scoreValue + "/10";
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

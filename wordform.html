@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập Cấu Tạo Từ (Word Form) Online</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f8e9; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2e7d32; text-align: center; margin-bottom: 20px; border-bottom: 3px solid #81c784; padding-bottom: 10px; }
+        .instruction { background: #e8f5e9; padding: 15px; border-left: 5px solid #2e7d32; margin-bottom: 25px; font-weight: 500; }
+        .question-item { margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #eee; }
+        .question-text { font-size: 1.05em; margin-bottom: 10px; }
+        .root-word { color: #d32f2f; font-weight: bold; background: #ffebee; padding: 2px 6px; border-radius: 4px; }
+        input[type="text"] { border: 2px solid #ddd; border-radius: 4px; padding: 8px 12px; width: 220px; font-size: 1em; outline: none; transition: border-color 0.3s; }
+        input[type="text"]:focus { border-color: #2e7d32; }
+        
+        .btn-container { text-align: center; margin-top: 30px; }
+        button { background-color: #2e7d32; color: white; border: none; padding: 12px 35px; font-size: 18px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-weight: bold; }
+        button:hover { background-color: #1b5e20; }
+
+        #result-box { display: none; margin-top: 30px; padding: 20px; border-radius: 10px; background: #fff; border: 2px solid #2e7d32; animation: slideIn 0.5s; }
+        .summary-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        .summary-table th { background-color: #2e7d32; color: white; }
+
+        .explanation { display: none; margin-top: 10px; font-size: 0.95em; color: #555; background: #f1f8e9; padding: 10px; border-radius: 5px; border-left: 3px solid #4caf50; }
+        .correct-text { color: #2e7d32; font-weight: bold; }
+        .wrong-text { color: #c62828; font-weight: bold; }
+
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>WORD FORMATION PRACTICE</h1>
+    <p class="instruction">Use the correct form of the word in brackets to complete the following sentences.</p>
+
+    <form id="wordFormQuiz">
+        <div id="quiz-content"></div>
+
+        <div class="btn-container">
+            <button type="button" onclick="checkWordForm()">Nộp bài & Kiểm tra</button>
+        </div>
+    </form>
+
+    <div id="result-box">
+        <h2 style="text-align: center; color: #2e7d32;">BẢNG TỔNG HỢP</h2>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Tổng câu hỏi</th>
+                    <th>Số câu đúng</th>
+                    <th>Số câu sai</th>
+                    <th>Điểm số</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="total">20</td>
+                    <td id="correct">0</td>
+                    <td id="wrong">0</td>
+                    <td id="score">0/10</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const wordData = [
+        { q: "These high-heeled shoes are ________ for such rough terrain.", root: "SUIT", ans: "unsuitable", exp: "Cần một tính từ mang nghĩa phủ định (vì terrain - địa hình - gồ ghề)." },
+        { q: "Colds are caused by viruses, so in the ________ of a virus, you can't catch a cold.", root: "ABSENT", ans: "absence", exp: "Sau mạo từ 'the' và trước 'of' cần một danh từ (sự thiếu vắng)." },
+        { q: "You're too young. This film is ________ for children your age.", root: "APPROPRIATE", ans: "inappropriate", exp: "Cần tính từ phủ định (không phù hợp) vì vế trước nói 'bạn còn quá trẻ'." },
+        { q: "________ now think that we may have viruses in our bodies already.", root: "SCIENCE", ans: "scientists", exp: "Cần danh từ số nhiều chỉ người (các nhà khoa học) làm chủ ngữ." },
+        { q: "In cold weather, blood vessels get smaller. ________, this also allows viruses to attack.", root: "FORTUNATE", ans: "unfortunately", exp: "Cần trạng từ đứng đầu câu để bổ nghĩa cho cả mệnh đề (thật không may)." },
+        { q: "Victoria Falls in Africa is one of the most ________ sights in the world.", root: "SPECTACLE", ans: "spectacular", exp: "Cần tính từ (spectacular - hùng vĩ) để bổ nghĩa cho danh từ 'sights'." },
+        { q: "It's also an ________ place for water sports.", root: "CREDIBLE", ans: "incredible", exp: "Cần tính từ (incredible - tuyệt vời/không thể tin được) đứng trước danh từ 'place'." },
+        { q: "We need you to provide an accurate ________ of the situation.", root: "DESCRIBE", ans: "description", exp: "Sau tính từ 'accurate' cần một danh từ (sự mô tả)." },
+        { q: "On arrival, it's the noise that makes the greatest ________.", root: "IMPRESS", ans: "impression", exp: "Sau tính từ 'greatest' cần một danh từ (ấn tượng)." },
+        { q: "The ________ landscape is also well worth a visit.", root: "SURROUND", ans: "surrounding", exp: "Cần tính từ (surrounding - bao quanh/phụ cận) bổ nghĩa cho 'landscape'." },
+        { q: "They are going to ________ the town with more trees and parks.", root: "BEAUTIFUL", ans: "beautify", exp: "Sau 'going to' cần một động từ (beautify - làm đẹp)." },
+        { q: "My colleagues are very pleasant, but my boss is very ________.", root: "FRIEND", ans: "unfriendly", exp: "Dựa vào 'but', cần một tính từ trái nghĩa với 'pleasant' (unfriendly - không thân thiện)." },
+        { q: "He would get very angry if you ________ with his ideas.", root: "AGREE", ans: "disagreed", exp: "Cấu trúc câu điều kiện loại 2, cần động từ phủ định (disagreed - không đồng ý)." },
+        { q: "She often makes a ________ between English and French.", root: "COMPARE", ans: "comparison", exp: "Make a comparison: Thực hiện sự so sánh (cần danh từ)." },
+        { q: "The bad result makes his parents ________.", root: "BORE", ans: "bored", exp: "Tính từ đuôi -ed chỉ cảm xúc của con người (bị làm cho chán nản)." },
+        { q: "They tried to win but their efforts are ________.", root: "UNSUCCESSFUL", ans: "unsuccessful", exp: "Dựa vào nghĩa câu 'họ đã cố gắng nhưng...', cần tính từ phủ định (không thành công)." },
+        { q: "Everyone admires her ________ to help the poor.", root: "READY", ans: "readiness", exp: "Sau tính từ sở hữu 'her' cần danh từ (sự sẵn lòng)." },
+        { q: "We must get rid of the ________ which slows our development.", root: "POOR", ans: "poverty", exp: "Cần danh từ chỉ sự nghèo đói (poverty) làm chủ ngữ cho mệnh đề quan hệ." },
+        { q: "He cycles ________ and had an accident.", root: "CARE", ans: "carelessly", exp: "Cần trạng từ bổ nghĩa cho động từ 'cycles' (carelessly - bất cẩn)." },
+        { q: "The country is very ________ so travelling by road is difficult.", root: "MOUNTAIN", ans: "mountainous", exp: "Cần tính từ (mountainous - có nhiều núi) bổ nghĩa cho chủ ngữ 'the country'." }
+    ];
+
+    const content = document.getElementById('quiz-content');
+
+    wordData.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        div.innerHTML = `
+            <div class="question-text"><strong>${i + 1}.</strong> ${item.q.replace('________', `<input type="text" id="ans-${i}">`)} <span class="root-word">${item.root}</span></div>
+            <div class="explanation" id="exp-${i}">
+                <span id="status-${i}"></span>
+                <strong>Đáp án:</strong> ${item.ans} <br>
+                <strong>Lý do:</strong> ${item.exp}
+            </div>
+        `;
+        content.appendChild(div);
+    });
+
+    function checkWordForm() {
+        let correctCount = 0;
+        wordData.forEach((item, i) => {
+            const userAns = document.getElementById(`ans-${i}`).value.trim().toLowerCase();
+            const expDiv = document.getElementById(`exp-${i}`);
+            const statusSpan = document.getElementById(`status-${i}`);
+            
+            expDiv.style.display = 'block';
+            if (userAns === item.ans.toLowerCase()) {
+                correctCount++;
+                statusSpan.innerHTML = '<span class="correct-text">✓ Chính xác!</span><br>';
+            } else {
+                statusSpan.innerHTML = '<span class="wrong-text">✗ Chưa đúng!</span><br>';
+            }
+        });
+
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('total').innerText = wordData.length;
+        document.getElementById('correct').innerText = correctCount;
+        document.getElementById('wrong').innerText = wordData.length - correctCount;
+        document.getElementById('score').innerText = (correctCount / wordData.length * 10).toFixed(1) + "/10";
+        
+        window.scrollTo({ top: document.getElementById('result-box').offsetTop - 20, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

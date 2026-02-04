@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập Ngữ Pháp Tiếng Anh Online</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 30px; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        .question-block { margin-bottom: 25px; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px; transition: all 0.3s ease; }
+        .question-text { font-weight: 600; font-size: 1.1em; margin-bottom: 15px; display: block; }
+        .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+        label { cursor: pointer; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; background: #fafafa; transition: background 0.2s; }
+        label:hover { background-color: #edf2f7; }
+        input[type="radio"] { margin-right: 12px; transform: scale(1.2); }
+        
+        .btn-container { text-align: center; margin-top: 40px; }
+        button { background-color: #3498db; color: white; border: none; padding: 15px 40px; font-size: 18px; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3); transition: transform 0.2s; }
+        button:hover { background-color: #2980b9; transform: translateY(-2px); }
+
+        #result-summary { display: none; margin-top: 30px; padding: 25px; background: #fff; border: 2px solid #3498db; border-radius: 15px; text-align: center; animation: fadeIn 0.5s; }
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .summary-table th, .summary-table td { border: 1px solid #ddd; padding: 15px; text-align: center; }
+        .summary-table th { background-color: #3498db; color: white; }
+
+        .explanation { display: none; margin-top: 15px; padding: 12px; background-color: #fff9db; border-left: 5px solid #f1c40f; font-size: 0.95em; border-radius: 5px; }
+        .correct-ans-text { color: #27ae60; font-weight: bold; margin-top: 5px; display: block; }
+        .correct { border-left: 8px solid #27ae60 !important; background-color: #f0fff4; }
+        .incorrect { border-left: 8px solid #e74c3c !important; background-color: #fff5f5; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>MULTIPLE CHOICE PRACTICE</h1>
+    <p style="text-align: center; color: #666;">Chọn đáp án đúng nhất cho các câu hỏi sau.</p>
+
+    <form id="quizForm">
+        <div id="questions-container"></div>
+        <div class="btn-container">
+            <button type="button" onclick="submitQuiz()">Nộp Bài & Xem Giải Thích</button>
+        </div>
+    </form>
+
+    <div id="result-summary">
+        <h2>Kết Quả Của Bạn</h2>
+        <table class="summary-table">
+            <tr>
+                <th>Tổng số câu</th>
+                <th>Số câu đúng</th>
+                <th>Số câu sai</th>
+                <th>Điểm số (thang 10)</th>
+            </tr>
+            <tr>
+                <td id="totalQ"></td>
+                <td id="correctQ"></td>
+                <td id="wrongQ"></td>
+                <td id="score"></td>
+            </tr>
+        </table>
+        <p style="margin-top: 20px; font-weight: bold; color: #2c3e50;">Kéo xuống dưới để xem giải thích chi tiết từng câu.</p>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { text: "I'm expecting to have this book __________ soon this year.", options: ["published", "publishing", "to publish", "publish"], correct: 0, exp: "Cấu trúc Have something done (bị động): Thuê/nhờ cái gì được làm bởi ai." },
+        { text: "________ your advice, I was able to avoid lots of trouble on my trip abroad.", options: ["Thanks to", "Despite", "Even though", "Instead of"], correct: 0, exp: "Thanks to + N: Nhờ có... (Mang nghĩa tích cực)." },
+        { text: "We have a party tonight and Daisy is worried about ________.", options: ["what to wear", "which wearing", "that she wears", "these wearing"], correct: 0, exp: "Wh- word + to V: Cấu trúc rút gọn của mệnh đề danh ngữ." },
+        { text: "As a rule, new comers ________ a party at the end of the first month of their stay.", options: ["was held", "hold", "have held", "will hold"], correct: 1, exp: "As a rule (như một thói quen/quy tắc) dùng thì Hiện tại đơn. Chủ ngữ số nhiều 'new comers' đi với 'hold'." },
+        { text: "The most interesting films ________ for the festival will be shown next week.", options: ["are chosen", "having chosen", "chosen", "being chosen"], correct: 2, exp: "Rút gọn mệnh đề quan hệ dạng bị động: films which were chosen -> chosen." },
+        { text: "However ________ about the results, the children still talk merrily.", options: ["disappointed are they", "disappointing they are", "disappointment", "disappointed they are"], correct: 3, exp: "Cấu trúc: However + Adj/Adv + S + V: Mặc dù... thế nào đi nữa." },
+        { text: "A child ________ to talk does not learn by being corrected all the time.", options: ["learned", "learns", "learning", "to learn"], correct: 2, exp: "Rút gọn mệnh đề quan hệ dạng chủ động: A child who is learning -> learning." },
+        { text: "Some businesses use famous cartoon ________ to advertise their products.", options: ["person", "people", "characters", "samples"], correct: 2, exp: "Cartoon characters: Nhân vật hoạt hình." },
+        { text: "The first thing you should do when you lose your bank card is to call your bank and ask them to close your ________.", options: ["account", "house", "loan", "debt"], correct: 0, exp: "Bank account: Tài khoản ngân hàng." },
+        { text: "“Oh no! I can’t find my credit card!” — “________.”", options: ["Thank you for letting me know", "Don’t worry. They will be back very soon", "It is a nice surprise. You should be glad about it", "Chill out. Try to remember when you last used it"], correct: 3, exp: "Lời khuyên phù hợp nhất khi ai đó mất đồ là bảo họ bình tĩnh và nhớ lại." },
+        { text: "– “What would you like to drink? “ – “ __________.”", options: ["Yes, please", "Milk, please", "No, thanks", "OK"], correct: 1, exp: "Đáp lại câu hỏi 'muốn uống gì' bằng tên loại đồ uống kèm 'please'." },
+        { text: "The number of cars on the roads ______ increasing, so we need to build more roads.", options: ["is", "was", "were", "are"], correct: 0, exp: "The number of + N số nhiều + V số ít. 'Is' dùng cho hiện tại vì vế sau là 'need'." },
+        { text: "______ the class size is our school’s immediate aim.", options: ["Reduces", "Reduce", "Reducing", "Reduced"], correct: 2, exp: "V-ing đóng vai trò làm chủ ngữ trong câu." },
+        { text: "He ________ being given a receipt for the bill he had paid.", options: ["asked to", "demanded", "insisted on", "required"], correct: 2, exp: "Insist on + V-ing: Khăng khăng làm gì/đòi cái gì." },
+        { text: "Some________ actions have been taken to help protect wildlife at this national park.", options: ["survival", "dispostal", "postal", "remedial"], correct: 3, exp: "Remedial actions: Những hành động nhằm cứu vãn/khắc phục tình hình." },
+        { text: "The demand for energy is ________more rapidly than ever.", options: ["exported", "decreased", "raising", "increasing"], correct: 3, exp: "Increase: Tăng lên (nói về nhu cầu/số lượng)." },
+        { text: "His performance was________; the audience was delighted.", options: ["unmarked", "faultless", "worthless", "imperfect"], correct: 1, exp: "Faultless: Không tì vết/hoàn hảo (Vì khán giả hài lòng)." },
+        { text: "But why did the police suspect you? It just does not make________ to me.", options: ["reason", "right", "sense", "truth"], correct: 2, exp: "Make sense: Có lý/hiểu được." },
+        { text: "In the end I ________the form in disgust, and threw it away.", options: ["filled in", "worked out", "tore up", "put off"], correct: 2, exp: "Tear up: Xé nát (vì ghét và vứt đi)." },
+        { text: "His company, ________him with a car and samples of their products.", options: ["gives", "supplies", "replies", "places"], correct: 1, exp: "Supply someone with something: Cung cấp cho ai cái gì." },
+        { text: "_________ saying was so important that I asked everyone to stop talking and listening.", options: ["What the woman was", "That the woman was", "The woman was", "When was the woman"], correct: 0, exp: "What + S + V: Đóng vai trò làm chủ ngữ (Mệnh đề danh ngữ)." },
+        { text: "– “Do you mind if I take a seat?” – “________.”", options: ["Yes, I don’t mind", "No, do as you please", "No I mind", "Yes, do as you please"], correct: 1, exp: "Đáp lại 'Do you mind' (Bạn có phiền...) bằng 'No' nghĩa là cho phép." },
+        { text: "As the two teams left the football ground, the 100,000 ________ gave them a standing ovation.", options: ["bystanders", "spectators", "viewers", "audiences"], correct: 1, exp: "Spectators: Khán giả xem trực tiếp các sự kiện thể thao." },
+        { text: "My parents lent me the money. ________, I couldn’t have afforded the trip.", options: ["However", "Therefore", "Only if", "Otherwise"], correct: 3, exp: "Otherwise: Nếu không thì... (Dùng cho câu điều kiện loại 3 rút gọn)." },
+        { text: "It is interesting to take ________ a new hobby such as collecting stamps or going fishing.", options: ["over", "on", "in", "up"], correct: 3, exp: "Take up a hobby: Bắt đầu một sở thích mới." },
+        { text: "Jack made me ________ him next week.", options: ["promise calling", "to promise calling", "to promise to call", "promise to call"], correct: 3, exp: "Make + O + V (nguyên thể) và Promise + to V." },
+        { text: "“I passed the TOEFL test, Mom.” – “________.”", options: ["All right", "Thank you", "Well done", "Good luck"], correct: 2, exp: "Well done: Lời khen ngợi khi ai đó đạt thành tích tốt." },
+        { text: "The bad weather caused serious damage to the crop. If only it ________ warmer.", options: ["was", "were", "has been", "had been"], correct: 3, exp: "If only + S + Past Perfect: Ước cho một sự việc đã xảy ra trong quá khứ." },
+        { text: "– “Eric is really upset about losing his job.” – “ Well, ________ once myself, I can understand.”", options: ["Having been fired", "Fired", "Having fired", "Being fired"], correct: 0, exp: "Phân từ hoàn thành (Having been V3) dùng để chỉ hành động xảy ra trước hành động khác." },
+        { text: "________ you, I’d think twice about that decision.", options: ["Were I", "Should I be", "If I am", "If I had been"], correct: 0, exp: "Đảo ngữ câu điều kiện loại 2: Were I you = If I were you." },
+        { text: "The teacher asked a difficult question, but finally Ted ________ a good answer.", options: ["put up with", "keep pace with", "made way for", "came up with"], correct: 3, exp: "Come up with: Nảy ra (ý tưởng/câu trả lời)." },
+        { text: "Not only ________ to speak to him, but she also vowed never to see him again.", options: ["she refused", "did she refuse", "she did refuse", "when she refused"], correct: 1, exp: "Đảo ngữ với Not only đứng đầu câu: Not only + Trợ động từ + S + V." },
+        { text: "The judge ________ the pedestrian for the accident.", options: ["accused", "charged", "caught", "blamed"], correct: 3, exp: "Blame someone for something: Đổ lỗi cho ai về việc gì." },
+        { text: "She had to borrow her sister’s car because hers was ________.", options: ["out of work", "out of order", "on duty", "off work"], correct: 1, exp: "Out of order: Bị hỏng (dùng cho máy móc/xe cộ)." },
+        { text: "We should participate in the movement ________ to conserve the natural environment.", options: ["to organize", "organizing", "which organized", "organized"], correct: 3, exp: "Rút gọn mệnh đề quan hệ dạng bị động: movement which was organized -> organized." },
+        { text: "His brother refuses to even listen to anyone else’s point of view. He is very ________.", options: ["open-minded", "kind-hearted", "narrow-minded", "absent-minded"], correct: 2, exp: "Narrow-minded: Hẹp hòi, không chịu lắng nghe ý kiến khác." },
+        { text: "There is ________ in my bedroom.", options: ["a square wooden old table", "an old square wooden table", "a wooden old square table", "an old wooden square table"], correct: 1, exp: "Thứ tự tính từ: OSASCOMP (Age -> Shape -> Material)." },
+        { text: "“I am sorry. I broke the vase”. – “________.”", options: ["OK. Go ahead", "Yes, certainly", "Don’t worry. Things break", "I’d rather not"], correct: 2, exp: "Đáp lại lời xin lỗi bằng cách trấn an đối phương." },
+        { text: "One’s fingerprints are ________ other person.", options: ["different from", "different from any", "differ from any", "different from those of any"], correct: 3, exp: "So sánh dấu vân tay của người này với 'những dấu vân tay' của người khác (those of any)." },
+        { text: "He is very happy because he passed his exam with ________ colors.", options: ["flying", "failing", "imagining", "changing"], correct: 0, exp: "Pass with flying colors: Vượt qua kỳ thi với điểm số rất cao." },
+        { text: "Mary has trouble ______ her homework.", options: ["to remember", "to remembering", "remember", "remembering"], correct: 3, exp: "Have trouble + V-ing: Gặp khó khăn khi làm gì." },
+        { text: "A learner driver must be ________ by a qualified driver.", options: ["connected", "accompanied", "involved", "associated"], correct: 1, exp: "Accompany: Đi cùng/hộ tống." },
+        { text: "He retired early ________ ill-health.", options: ["on account of", "ahead of", "on behalf of", "in front of"], correct: 0, exp: "On account of = Because of: Bởi vì." },
+        { text: "Nowadays children would prefer history _________ in more practical ways.", options: ["to be taught", "teach", "be taught", "to be teaching"], correct: 0, exp: "Prefer + something + to be done (bị động)." },
+        { text: "You need more exercise, so you should _______ golf.", options: ["carry out", "take in", "turn up", "take up"], correct: 3, exp: "Take up a sport: Bắt đầu chơi một môn thể thao." }
+    ];
+
+    const container = document.getElementById('questions-container');
+
+    // Tự động load câu hỏi
+    questions.forEach((q, index) => {
+        const block = document.createElement('div');
+        block.className = 'question-block';
+        block.id = `block-${index}`;
+        
+        let optionsHTML = '';
+        const labels = ['A', 'B', 'C', 'D'];
+        q.options.forEach((opt, i) => {
+            optionsHTML += `
+                <label>
+                    <input type="radio" name="q${index}" value="${i}"> 
+                    <strong>${labels[i]}.</strong> ${opt}
+                </label>
+            `;
+        });
+
+        block.innerHTML = `
+            <span class="question-text">${index + 16}. ${q.text}</span>
+            <div class="options">${optionsHTML}</div>
+            <div class="explanation" id="exp-${index}">
+                <span class="correct-ans-text">Đáp án đúng: ${labels[q.correct]}</span>
+                <strong>Giải thích:</strong> ${q.exp}
+            </div>
+        `;
+        container.appendChild(block);
+    });
+
+    function submitQuiz() {
+        let correctCount = 0;
+        
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            const block = document.getElementById(`block-${index}`);
+            const exp = document.getElementById(`exp-${index}`);
+            
+            exp.style.display = 'block';
+
+            if (selected) {
+                if (parseInt(selected.value) === q.correct) {
+                    correctCount++;
+                    block.classList.add('correct');
+                    block.classList.remove('incorrect');
+                } else {
+                    block.classList.add('incorrect');
+                    block.classList.remove('correct');
+                }
+            } else {
+                block.classList.add('incorrect');
+            }
+        });
+
+        const total = questions.length;
+        document.getElementById('result-summary').style.display = 'block';
+        document.getElementById('totalQ').innerText = total;
+        document.getElementById('correctQ').innerText = correctCount;
+        document.getElementById('wrongQ').innerText = total - correctCount;
+        document.getElementById('score').innerText = ((correctCount / total) * 10).toFixed(2);
+
+        window.scrollTo({ top: document.getElementById('result-summary').offsetTop - 50, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
